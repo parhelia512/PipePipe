@@ -31,23 +31,7 @@ jobs:
       - name: 设置 Android SDK
         uses: android-actions/setup-android@v2
 
-      - name: 缓存 Android NDK
-        id: cache-ndk
-        uses: actions/cache@v3
-        with:
-          path: ${ANDROID_SDK_ROOT}/ndk/android-ndk-r22b
-          key: android-ndk-r22b
-
-      - name: 检查缓存状态
-        run: |
-          if [[ "${{ steps.cache-ndk.outputs.cache-hit }}" == "true" ]]; then
-            echo "缓存已命中，无需下载 NDK"
-          else
-            echo "缓存未命中，将下载 NDK"
-          fi
-
       - name: 下载 Android NDK
-        if: steps.cache-ndk.outputs.cache-hit != 'true'
         run: |
           mkdir -p ${ANDROID_SDK_ROOT}/ndk
           wget https://dl.google.com/android/repository/android-ndk-r22b-linux-x86_64.zip
@@ -55,13 +39,39 @@ jobs:
 
       - name: 构建 FFmpeg-Kit LTS
         run: |
+          
           git clone https://github.com/InfinityLoop1308/ffmpeg-kit.git
           cd ffmpeg-kit
+          
+          # 构建 LTS 版本，并启用 gmp 和 gnutls 外部库
           BUILD_OPTIONS="--lts --enable-gmp --enable-gnutls --enable-android-media-codec --enable-android-zlib"
+          
+          # 添加额外的构建选项
           if [[ -n "${{ github.event.inputs.extra_options }}" ]]; then
             BUILD_OPTIONS="${BUILD_OPTIONS} ${{ github.event.inputs.extra_options }}"
           fi
+          
+          # 执行构建脚本
           ./android.sh ${BUILD_OPTIONS}
+
+      - name: 打印构建日志
+        if: ${{ always() }}  # 无论成功或失败都执行
+        run: |
+          if [[ -f build.log ]]; then
+            cat build.log
+          else
+            echo "build.log 文件不存在"
+          fi
+
+      - name: 打印 FFmpeg 配置日志（失败时）
+        if: ${{ failure() }}  # 仅在构建失败时执行
+        run: |
+          if [[ -f ./src/ffmpeg/ffbuild/config.log ]]; then
+            tail -50 ./src/ffmpeg/ffbuild/config.log
+          else
+            echo "FFmpeg 配置日志文件 (config.log) 不存在"
+          fi
+
 
       - name: 上传 LTS AAR 文件
         uses: actions/upload-artifact@v4
