@@ -48,6 +48,7 @@ jobs:
         run: |
           
           git clone https://github.com/InfinityLoop1308/ffmpeg-kit.git
+          cd ffmpeg-kit
           
           # 构建 LTS 版本，并启用 gmp 和 gnutls 外部库
           BUILD_OPTIONS="--lts --enable-gmp --enable-gnutls --enable-android-media-codec --enable-android-zlib"
@@ -58,7 +59,7 @@ jobs:
           fi
           
           # 执行构建脚本
-          ./ffmpeg-kit/android.sh ${BUILD_OPTIONS}
+          ./android.sh ${BUILD_OPTIONS}
 
       - name: 上传 LTS AAR 文件
         uses: actions/upload-artifact@v4
