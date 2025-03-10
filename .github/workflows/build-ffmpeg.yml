@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: 检出代码
@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
 
       - name: 安装依赖包
         run: |
@@ -31,12 +31,18 @@ jobs:
       - name: 设置 Android SDK
         uses: android-actions/setup-android@v2
 
+      - name: 缓存 Android NDK
+        uses: actions/cache@v3
+        with:
+          path: ${ANDROID_SDK_ROOT}/ndk/android-ndk-r22b
+          key: android-ndk-r22b
+
       - name: 下载 Android NDK
+        if: steps.cache-ndk.outputs.cache-hit != 'true'
         run: |
           mkdir -p ${ANDROID_SDK_ROOT}/ndk
           wget https://dl.google.com/android/repository/android-ndk-r22b-linux-x86_64.zip
           unzip android-ndk-r22b-linux-x86_64.zip -d ${ANDROID_SDK_ROOT}/ndk
-          echo "ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk/android-ndk-r22b" >> $GITHUB_ENV
 
       - name: 构建 FFmpeg-Kit LTS
         run: |
