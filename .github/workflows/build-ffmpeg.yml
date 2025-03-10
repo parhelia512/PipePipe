@@ -57,12 +57,21 @@ jobs:
       - name: 打印构建日志
         if: ${{ always() }}  # 无论成功或失败都执行
         run: |
-          pwd
           cd ffmpeg-kit
           if [[ -f build.log ]]; then
             cat build.log
           else
             echo "build.log 文件不存在"
+          fi
+
+      - name: 打印 FFmpeg 配置日志（失败时）
+        if: ${{ failure() }}  # 仅在构建失败时执行
+        run: |
+          cd ffmpeg-kit
+          if [[ -f ./src/ffmpeg/ffbuild/config.log ]]; then
+            tail -50 ./src/ffmpeg/ffbuild/config.log
+          else
+            echo "FFmpeg 配置日志文件 (config.log) 不存在"
           fi
 
 
