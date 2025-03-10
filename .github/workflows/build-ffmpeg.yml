@@ -68,8 +68,8 @@ jobs:
         if: ${{ failure() }}  # 仅在构建失败时执行
         run: |
           cd ffmpeg-kit
-          if [[ -f ./src/ffmpeg/ffbuild/config.log ]]; then
-            tail -50 ./src/ffmpeg/ffbuild/config.log
+          if [[ -f config.log ]]; then
+            cat config.log
           else
             echo "FFmpeg 配置日志文件 (config.log) 不存在"
           fi
