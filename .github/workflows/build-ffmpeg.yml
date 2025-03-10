@@ -59,7 +59,7 @@ jobs:
           if-no-files-found: warn
 
       - name: 上传预编译库
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ffmpeg-kit-prebuilt-lts
           path: prebuilt/
