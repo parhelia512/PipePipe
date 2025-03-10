@@ -46,8 +46,12 @@ jobs:
 
       - name: 构建 FFmpeg-Kit LTS
         run: |
+          
+          git clone https://github.com/InfinityLoop1308/ffmpeg-kit.git
+          cd ffmpeg-kit
+          
           # 构建 LTS 版本，并启用 gmp 和 gnutls 外部库
-          BUILD_OPTIONS="--lts --enable-gmp --enable-gnutls"
+          BUILD_OPTIONS="--lts --enable-gmp --enable-gnutls --enable-android-media-codec --enable-android-zlib"
           
           # 添加额外的构建选项
           if [[ -n "${{ github.event.inputs.extra_options }}" ]]; then
